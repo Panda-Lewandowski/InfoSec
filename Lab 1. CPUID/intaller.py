@@ -6,18 +6,22 @@ import os
 
 
 def get_CPUsum():
-    if platform == "linux" or platform == "linux2" or platform == "win32": # "cat", "/proc/cpuinfo"
-        # linux
-        print("Sorry, but this program only for MacOS! ")
-        return None
+    if platform == "win32":  # wmic csproduct get  UUID
+        output = check_output("wmic csproduct get UUID", shell=True).decode()
+        hard_uuid = output.split("\n")[1]
+        output = check_output("wmic csproduct get IdentifyingNumber", shell=True).decode()
+        serial_num = output.split("\n")[1]
+    elif platform == "linux" or platform == "linux2": dmidecode | grep -i uuid 
+        output = check_output("dmidecode -s system-uuid", shell=True).decode()
+        hard_uuid = output.split(":")[1][1:-1]
+        serial_num = check_output("dmidecode -s system-serial-number", shell=True).decode()
     elif platform == "darwin":
-        # OS X
         output = check_output("system_profiler SPHardwareDataType | grep UUID", shell=True).decode()
         hard_uuid = output.split(":")[1][1:-1]
         output = check_output("system_profiler SPHardwareDataType | grep Serial", shell=True).decode()
         serial_num = output.split(":")[1][1:-1]
-        check_str = hard_uuid + " " + serial_num
-        return hashlib.sha256(check_str.encode('utf-8')).hexdigest()
+    check_str = hard_uuid + " " + serial_num
+    return hashlib.sha256(check_str.encode('utf-8')).hexdigest()
 
 def check_CPUsum(given_checksum):
     real_key = from_license_key()
