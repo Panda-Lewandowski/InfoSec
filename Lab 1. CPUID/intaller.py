@@ -11,7 +11,7 @@ def get_CPUsum():
         hard_uuid = output.split("\n")[1]
         output = check_output("wmic csproduct get IdentifyingNumber", shell=True).decode()
         serial_num = output.split("\n")[1]
-    elif platform == "linux" or platform == "linux2": dmidecode | grep -i uuid 
+    elif platform == "linux" or platform == "linux2": #dmidecode | grep -i uuid 
         output = check_output("dmidecode -s system-uuid", shell=True).decode()
         hard_uuid = output.split(":")[1][1:-1]
         serial_num = check_output("dmidecode -s system-serial-number", shell=True).decode()
