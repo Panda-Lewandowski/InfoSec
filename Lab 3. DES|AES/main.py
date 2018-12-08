@@ -2,47 +2,26 @@ if __name__ == '__main__':
 
     import os
     import time
+    import sys
 
     import aes128
     
-    print('Step 1:')
-    while True:
-        print('Press 1 for encription smth and 2 for decription')
-        way = input()
-        if way not in ['1', '2']:
-            print('Action denied')
-            continue
-        else:
-            break
-    print()
+    way = sys.argv[1]
 
-    print('Step 2:')
-    while True:
-        print('Enter full name of file')
-        input_path = os.path.abspath(input())
-
-        if os.path.isfile(input_path):
-            break
-        else:
-            print('This is not a file')
-            continue
-    print()
-
-    print('Step 3:')
-    while True:
-        print('Enter your Key for encription/decription. The Key must be less than 16 symbols. Please, don\'t forget it!')
-        key = input()
-        
-        if len(key) > 16:
-            print('Too long Key. Imagine another one')
-            continue
-        
-        for symbol in key:
-            if ord(symbol) > 0xff:
-                print('That key won\'t work. Try another using only latin alphabet and numbers')
-                continue
-        
-        break
+    input_path = sys.argv[2]
+    if not os.path.isfile(input_path):
+        print('The file you enter is not a file')
+        exit()
+    
+    key = sys.argv[3]
+    if len(key) > 16:
+        print('Too long Key.')
+        exit()
+    for symbol in key:
+        if ord(symbol) > 0xff:
+            print('That key won\'t work. It must contain only latin alphabet and numbers')
+            exit()
+    
     print('\r\nPlease, wait...')
 
     time_before = time.time()
@@ -51,7 +30,7 @@ if __name__ == '__main__':
     with open(input_path, 'rb') as f:
         data = f.read()    
 
-    if way == '1':
+    if way == '-e':
         crypted_data = []
         temp = []
         for byte in data:
@@ -73,13 +52,13 @@ if __name__ == '__main__':
                 crypted_part = aes128.encrypt(temp, key)
                 crypted_data.extend(crypted_part)
 
-        out_path = os.path.join(os.path.dirname(input_path) , 'crypted_' + os.path.basename(input_path))
+        out_path = os.path.join(os.path.dirname(input_path) , os.path.basename(input_path).split('.')[0] + ".encoded")
 
         # Ounput data
-        with open(out_path, 'xb') as ff:
+        with open(out_path, 'wb') as ff:
             ff.write(bytes(crypted_data))
 
-    else: # if way == '2'
+    elif way == '-d':
         decrypted_data = []
         temp = []
         for byte in data:
@@ -101,10 +80,10 @@ if __name__ == '__main__':
                 decrypted_part = aes128.encrypt(temp, key)
                 decrypted_data.extend(crypted_part) 
 
-        out_path = os.path.join(os.path.dirname(input_path) , 'decrypted_' + os.path.basename(input_path))
+        out_path = os.path.join(os.path.dirname(input_path) , os.path.basename(input_path).split('.')[0] + ".decoded")
 
         # Ounput data
-        with open(out_path, 'xb') as ff:
+        with open(out_path, 'wb') as ff:
             ff.write(bytes(decrypted_data))
 
     time_after = time.time()
