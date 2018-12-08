@@ -86,17 +86,18 @@ class EnigmaMachine:
 
         return self.plugboard.signal(pos)
 
-    def process_text(self, text, replace_char='X'):
+    def process_text(self, text):
         result = []
         for key in text:
             c = key.upper()
 
             if c not in KEYBOARD_SET: 
-                if replace_char:
-                    c = replace_char
+                if c == '=' or c in string.digits:
+                    result.append(c)
+                    continue
                 else:
-                    continue    # ignore it
-
+                    raise EnigmaError('illegal symbol')
+                    
             result.append(self.key_press(c))
 
         return ''.join(result)
